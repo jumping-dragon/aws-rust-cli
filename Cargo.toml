@@ -1,0 +1,15 @@
+[package]
+name = "aws-rust-cli"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+aws-config = "1.2.1"
+aws-sdk-config = "1.22.0"
+aws-sdk-sts = "1.21.0"
+dotenvy = "0.15.6"
+reqwest = "0.12.4"
+serde_json = "1.0.116"
+tokio = { version = "1", features = ["full"] }
