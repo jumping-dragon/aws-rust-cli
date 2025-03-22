@@ -1,8 +1,8 @@
 use aws_config::BehaviorVersion;
 use aws_sdk_sts::types::{Credentials, PolicyDescriptorType};
+use dotenvy::dotenv;
 use reqwest::Url;
 use serde_json::json;
-use dotenvy::dotenv;
 use std::env;
 
 #[tokio::main]
@@ -12,14 +12,18 @@ async fn main() {
         dotenv().expect(".env file not found");
     }
     let aws_profile_name = env::var("AWS_PROFILE").expect("AWS_PROFILE not set");
-    let aws_config = aws_config::defaults(BehaviorVersion::v2023_11_09())
+    let aws_config = aws_config::defaults(BehaviorVersion::v2025_01_17())
         .profile_name(aws_profile_name)
         .load()
         .await;
 
     let aws_sdk_sts_client = aws_sdk_sts::Client::new(&aws_config);
 
-    let policy_arn = PolicyDescriptorType::builder().set_arn(Some("arn:aws:iam::aws:policy/AdministratorAccess".to_string())).build();
+    let policy_arn = PolicyDescriptorType::builder()
+        .set_arn(Some(
+            "arn:aws:iam::aws:policy/AdministratorAccess".to_string(),
+        ))
+        .build();
 
     let data = aws_sdk_sts_client
         .get_federation_token()
@@ -48,7 +52,12 @@ async fn main() {
         .append_pair("Action", "getSigninToken")
         .append_pair("SessionDuration", "43200")
         .append_pair("Session", &credentials_json.to_string());
-    let body = reqwest::get(url.clone()).await.unwrap().text().await.unwrap();
+    let body = reqwest::get(url.clone())
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
     let data: serde_json::Value = serde_json::from_str(&body).unwrap();
 
     let mut url = Url::parse("https://signin.aws.amazon.com/federation").unwrap();
